@@ -1,3 +1,5 @@
+import { injectQueryPaths } from './responses'
+
 import { getSfdxOrgInfo } from '../../lib/sfdx'
 
 import type { Try } from '@skyleague/axioms'
@@ -10,6 +12,7 @@ interface GenerateSobjectSpecInput {
     baseUrl: string
     apiVersion: string
     resourcePaths: string[]
+    injectQueryEndpoints: boolean
     cwd: string
 }
 
@@ -18,6 +21,7 @@ export async function generateSobjectSpec({
     apiVersion,
     cwd,
     resourcePaths,
+    injectQueryEndpoints,
 }: GenerateSobjectSpecInput): Promise<string> {
     const org = await getSfdxOrgInfo({ baseUrl, cwd })
 
@@ -61,8 +65,12 @@ export async function generateSobjectSpec({
         `${chalk.blue('→')} Generated oas3 definition, replacing versions [from: ${result.info.version}, to: ${apiVersion}]`
     )
 
+    if (injectQueryEndpoints) {
+        result = injectQueryPaths(result)
+    }
+
     let formatted = JSON.stringify(result, null, 2)
-    formatted = formatted.replaceAll(result.info.version, apiVersion)
+    formatted = formatted.replaceAll(result.info?.version ?? apiVersion, apiVersion)
 
     return formatted
 }

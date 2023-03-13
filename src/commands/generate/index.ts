@@ -41,15 +41,21 @@ export function builder(yargs: Argv) {
             description: 'Base URL of your Salesforce instance',
             type: 'string',
         })
+        .option('query-endpoints', {
+            default: true,
+            description: 'Inject query endpoints into the OpenAPI spec',
+            type: 'boolean',
+        })
 }
 
 export async function handler(argv: ReturnType<typeof builder>['argv']): Promise<void> {
-    const { outFile, outDir: _outDir, resourcePaths, orgBaseUrl, apiVersion } = await argv
+    const { outFile, outDir: _outDir, resourcePaths, orgBaseUrl, apiVersion, queryEndpoints: injectQueryEndpoints } = await argv
     const cwd = process.cwd()
     const outDir = path.resolve(cwd, _outDir)
 
     const spec = await generateSobjectSpec({
         baseUrl: orgBaseUrl,
+        injectQueryEndpoints,
         resourcePaths,
         apiVersion,
         cwd,

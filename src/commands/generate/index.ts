@@ -1,4 +1,4 @@
-import { generateSobjectSpec } from './generate'
+import { generateSobjectSpec } from './generate.js'
 
 import { asArray } from '@skyleague/axioms'
 import chalk from 'chalk'
@@ -6,8 +6,8 @@ import { format } from 'date-fns'
 import inquirer from 'inquirer'
 import type { Argv } from 'yargs'
 
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 
 export function builder(yargs: Argv) {
     return yargs

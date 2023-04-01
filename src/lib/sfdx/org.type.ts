@@ -14,7 +14,7 @@ export interface Org {
 }
 
 export const Org = {
-    validate: require('./schemas/org.schema.js') as ValidateFunction<Org>,
+    validate: (await import('./schemas/org.schema.js')).validate10 as unknown as ValidateFunction<Org>,
     get schema() {
         return Org.validate.schema
     },
@@ -34,7 +34,7 @@ export interface OrgList {
 }
 
 export const OrgList = {
-    validate: require('./schemas/org-list.schema.js') as ValidateFunction<OrgList>,
+    validate: (await import('./schemas/org-list.schema.js')).validate10 as unknown as ValidateFunction<OrgList>,
     get schema() {
         return OrgList.validate.schema
     },

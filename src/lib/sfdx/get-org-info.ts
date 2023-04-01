@@ -1,12 +1,12 @@
-import type { Org } from './org.type'
-import { OrgList } from './org.type'
+import type { Org } from './org.type.js'
+import { OrgList } from './org.type.js'
 
 import { asTry, isFailure, mapTry } from '@skyleague/axioms'
 import { ValidationError } from 'ajv'
 import chalk from 'chalk'
 
-import { execFile } from 'child_process'
-import { promisify } from 'util'
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
 
 export async function getSfdxOrgInfo({ baseUrl, cwd }: { baseUrl: string; cwd: string }): Promise<Org> {
     console.log(`${chalk.blue('→')} Trying to find active credentials on sfdx...`)

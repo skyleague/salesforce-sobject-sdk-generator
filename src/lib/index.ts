@@ -1,1 +1,1 @@
-export * from './sfdx'
+export * from './sfdx/index.js'

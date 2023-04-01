@@ -1,12 +1,13 @@
-import * as commands from './commands'
+import * as commands from './commands/index.js'
 
-import { bin } from '../package.json'
+import packageJson from '../package.json' assert { type: 'json' }
 
 import { install } from 'source-map-support'
 import type { CommandModule } from 'yargs'
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/consistent-type-imports, @typescript-eslint/no-var-requires
-const yargs: typeof import('yargs') = require('yargs')
+const { bin } = packageJson
 
 /**
  * @internal
@@ -14,11 +15,11 @@ const yargs: typeof import('yargs') = require('yargs')
 export async function run(): Promise<void> {
     install()
 
-    let cli = yargs.scriptName(Object.keys(bin)[0])
+    let cli = yargs(hideBin(process.argv)).scriptName(Object.keys(bin)[0]!)
     for (const command of Object.values(commands)) {
         cli = cli.command(command.default as unknown as CommandModule)
     }
     await cli.demandCommand().strict().help().argv
 }
 
-export * from './lib'
+export * from './lib/index.js'

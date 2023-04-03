@@ -1,6 +1,6 @@
-import { injectQueryPaths } from './responses'
+import { injectQueryPaths } from './responses.js'
 
-import { getSfdxOrgInfo } from '../../lib/sfdx'
+import { getSfdxOrgInfo } from '../../lib/sfdx/index.js'
 
 import type { Try } from '@skyleague/axioms'
 import { asTry, isFailure, sleep } from '@skyleague/axioms'

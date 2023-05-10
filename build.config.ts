@@ -7,8 +7,8 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 async function main() {
-    execFileSync(`rm`, ['-rf', 'dist'], { stdio: 'inherit', cwd: __dirname })
-    execFileSync('npx', ['tsc', '-p', 'tsconfig.dist.json'], { stdio: 'inherit', cwd: __dirname })
+    execFileSync(`rm`, ['-rf', 'dist'], { stdio: 'inherit', cwd: __dirname, shell: true })
+    execFileSync('npx', ['tsc', '-p', 'tsconfig.dist.json'], { stdio: 'inherit', cwd: __dirname, shell: true })
 
     const srcDir = path.join(__dirname, 'src')
     await Promise.all(

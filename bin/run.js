@@ -18,6 +18,7 @@ if (dev && !process.env.NODE_OPTIONS?.includes('--loader ts-node/esm')) {
                 cwd: process.cwd(),
                 env: { ...process.env, NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ''} --loader ts-node/esm/transpile-only` },
                 stdio: 'inherit',
+                shell: true,
             },
             (err, stdout, stderr) => {
                 if (err) {

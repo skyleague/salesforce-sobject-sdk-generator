@@ -11,18 +11,21 @@ import { promisify } from 'node:util'
 export async function getSfdxOrgInfo({ baseUrl, cwd }: { baseUrl: string; cwd: string }): Promise<Org> {
     console.log(`${chalk.blue('→')} Trying to find active credentials on sfdx...`)
 
-    const orgs = mapTry(await asTry(promisify(execFile)('sfdx', ['org', 'list', 'auth', '--json'], { cwd })), ({ stdout }) => {
-        const parsed: unknown = JSON.parse(stdout)
-        if (OrgList.is(parsed)) {
-            console.log(
-                `${chalk.blue('→')} Found credentials...`,
-                Object.fromEntries(parsed.result.map((o) => [o.instanceUrl, o.username]))
-            )
-            return parsed.result
-        } else {
-            throw new ValidationError(OrgList.errors ?? [])
+    const orgs = mapTry(
+        await asTry(promisify(execFile)('sfdx', ['org', 'list', 'auth', '--json'], { cwd, shell: true })),
+        ({ stdout }) => {
+            const parsed: unknown = JSON.parse(stdout)
+            if (OrgList.is(parsed)) {
+                console.log(
+                    `${chalk.blue('→')} Found credentials...`,
+                    Object.fromEntries(parsed.result.map((o) => [o.instanceUrl, o.username]))
+                )
+                return parsed.result
+            } else {
+                throw new ValidationError(OrgList.errors ?? [])
+            }
         }
-    })
+    )
 
     const org = mapTry(orgs, (os) => {
         console.log(`${chalk.blue('→')} Searching for matching instanceUrl [expected: ${baseUrl}]`)

@@ -49,7 +49,7 @@
   },
   "devDependencies": {
     "@skyleague/node-standards": "^3.10.5",
-    "@skyleague/therefore": "^3.0.1",
+    "@skyleague/therefore": "^3.0.2",
     "@types/inquirer": "^9.0.6",
     "@types/yargs": "^17.0.29",
     "got": "^13.0.0",

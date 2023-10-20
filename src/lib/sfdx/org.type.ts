@@ -3,8 +3,8 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import AjvValidator from 'ajv'
 import type { ValidateFunction } from 'ajv'
+import { ValidationError } from 'ajv'
 
 export interface Org {
     orgId: string
@@ -14,7 +14,7 @@ export interface Org {
 }
 
 export const Org = {
-    validate: (await import('./schemas/org.schema.js')).validate10 as unknown as ValidateFunction<Org>,
+    validate: (await import('./schemas/org.schema.js')).validate as ValidateFunction<Org>,
     get schema() {
         return Org.validate.schema
     },
@@ -24,7 +24,7 @@ export const Org = {
     is: (o: unknown): o is Org => Org.validate(o) === true,
     assert: (o: unknown) => {
         if (!Org.validate(o)) {
-            throw new AjvValidator.ValidationError(Org.errors ?? [])
+            throw new ValidationError(Org.errors ?? [])
         }
     },
 } as const
@@ -34,7 +34,7 @@ export interface OrgList {
 }
 
 export const OrgList = {
-    validate: (await import('./schemas/org-list.schema.js')).validate10 as unknown as ValidateFunction<OrgList>,
+    validate: (await import('./schemas/org-list.schema.js')).validate as ValidateFunction<OrgList>,
     get schema() {
         return OrgList.validate.schema
     },
@@ -44,7 +44,7 @@ export const OrgList = {
     is: (o: unknown): o is OrgList => OrgList.validate(o) === true,
     assert: (o: unknown) => {
         if (!OrgList.validate(o)) {
-            throw new AjvValidator.ValidationError(OrgList.errors ?? [])
+            throw new ValidationError(OrgList.errors ?? [])
         }
     },
 } as const

@@ -33,7 +33,7 @@ export function builder(yargs: Argv) {
             type: 'array',
             description: 'List of paths to export into the OpenAPI specification',
             coerce: (arg: string[]) => {
-                return asArray(arg).flatMap((x) => `${x}`.split(','))
+                return asArray(arg).flatMap((x) => `${x as string | number}`.split(','))
             },
         })
         .option('org-base-url', {

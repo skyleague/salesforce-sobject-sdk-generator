@@ -1,7 +1,7 @@
 import type { Org } from './org.type.js'
 import { OrgList } from './org.type.js'
 
-import { asTry, isFailure, mapTry } from '@skyleague/axioms'
+import { asTry, isFailure, isRight, mapTry } from '@skyleague/axioms'
 import { ValidationError } from 'ajv'
 import chalk from 'chalk'
 
@@ -14,17 +14,16 @@ export async function getSfdxOrgInfo({ baseUrl, cwd }: { baseUrl: string; cwd: s
     const orgs = mapTry(
         await asTry(promisify(execFile)('sfdx', ['org', 'list', 'auth', '--json'], { cwd, shell: true })),
         ({ stdout }) => {
-            const parsed: unknown = JSON.parse(stdout)
-            if (OrgList.is(parsed)) {
+            const parsed = OrgList.parse(JSON.parse(stdout))
+            if (isRight(parsed)) {
                 console.log(
                     `${chalk.blue('→')} Found credentials...`,
-                    Object.fromEntries(parsed.result.map((o) => [o.instanceUrl, o.username]))
+                    Object.fromEntries(parsed.right.result.map((o) => [o.instanceUrl, o.username])),
                 )
-                return parsed.result
-            } else {
-                throw new ValidationError(OrgList.errors ?? [])
+                return parsed.right.result
             }
-        }
+            throw new ValidationError(parsed.left ?? [])
+        },
     )
 
     const org = mapTry(orgs, (os) => {
@@ -41,8 +40,8 @@ export async function getSfdxOrgInfo({ baseUrl, cwd }: { baseUrl: string; cwd: s
     if (isFailure(org)) {
         console.info(
             `${chalk.red(
-                '❌'
-            )} Not signed into the expected organization. To sign in, install sfdx and execute:\n\tsfdx org login web -r ${baseUrl}`
+                '❌',
+            )} Not signed into the expected organization. To sign in, install sfdx and execute:\n\tsfdx org login web -r ${baseUrl}`,
         )
         throw org
     }

@@ -3,8 +3,11 @@
  * Do not manually touch this
  */
 /* eslint-disable */
-import type { ValidateFunction } from 'ajv'
-import { ValidationError } from 'ajv'
+
+import type { DefinedError, ValidateFunction } from 'ajv'
+
+import { validate as OrgListValidator } from './schemas/org-list.schema.js'
+import { validate as OrgValidator } from './schemas/org.schema.js'
 
 export interface Org {
     orgId: string
@@ -14,7 +17,7 @@ export interface Org {
 }
 
 export const Org = {
-    validate: (await import('./schemas/org.schema.js')).validate as ValidateFunction<Org>,
+    validate: OrgValidator as ValidateFunction<Org>,
     get schema() {
         return Org.validate.schema
     },
@@ -22,10 +25,11 @@ export const Org = {
         return Org.validate.errors ?? undefined
     },
     is: (o: unknown): o is Org => Org.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!Org.validate(o)) {
-            throw new ValidationError(Org.errors ?? [])
+    parse: (o: unknown): { right: Org } | { left: DefinedError[] } => {
+        if (Org.is(o)) {
+            return { right: o }
         }
+        return { left: (Org.errors ?? []) as DefinedError[] }
     },
 } as const
 
@@ -34,7 +38,7 @@ export interface OrgList {
 }
 
 export const OrgList = {
-    validate: (await import('./schemas/org-list.schema.js')).validate as ValidateFunction<OrgList>,
+    validate: OrgListValidator as ValidateFunction<OrgList>,
     get schema() {
         return OrgList.validate.schema
     },
@@ -42,9 +46,10 @@ export const OrgList = {
         return OrgList.validate.errors ?? undefined
     },
     is: (o: unknown): o is OrgList => OrgList.validate(o) === true,
-    assert: (o: unknown) => {
-        if (!OrgList.validate(o)) {
-            throw new ValidationError(OrgList.errors ?? [])
+    parse: (o: unknown): { right: OrgList } | { left: DefinedError[] } => {
+        if (OrgList.is(o)) {
+            return { right: o }
         }
+        return { left: (OrgList.errors ?? []) as DefinedError[] }
     },
 } as const

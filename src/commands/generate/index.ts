@@ -50,6 +50,10 @@ export function builder(yargs: Argv) {
 
 export async function handler(argv: ReturnType<typeof builder>['argv']): Promise<void> {
     const { outFile, outDir: _outDir, resourcePaths, orgBaseUrl, apiVersion, queryEndpoints: injectQueryEndpoints } = await argv
+
+    if (Number.parseInt(apiVersion.split('.')[0]?.replace(/[^0-9]/g, '') ?? '0') < 61) {
+        throw new Error(`API version must be 61.0 or higher (provided: ${apiVersion})`)
+    }
     const cwd = process.cwd()
     const outDir = path.resolve(cwd, _outDir)
 

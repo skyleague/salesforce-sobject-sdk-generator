@@ -6,10 +6,10 @@ export const org = $validator(
         username: $string,
         instanceUrl: $string,
         accessToken: $string,
-    })
+    }),
 )
 export const orgList = $validator(
     $object({
         result: $array($ref(org)),
-    })
+    }),
 )

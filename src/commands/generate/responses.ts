@@ -33,7 +33,7 @@ export const queryErrorResponses = Object.fromEntries(
                 },
             },
         },
-    ])
+    ]),
 )
 
 export function injectQueryPaths(spec: Partial<OpenapiV3>): Partial<OpenapiV3> {

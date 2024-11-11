@@ -4,6 +4,7 @@ import { asTry, isFailure, mapTry, sleep } from '@skyleague/axioms'
 import type { OpenapiV3 } from '@skyleague/therefore'
 import chalk from 'chalk'
 import got, { HTTPError } from 'got'
+import { formatError } from '../../lib/error.js'
 import { getSfdxOrgInfo } from '../../lib/sfdx/index.js'
 interface GenerateSobjectSpecInput {
     baseUrl: string
@@ -13,14 +14,11 @@ interface GenerateSobjectSpecInput {
     cwd: string
 }
 
-export async function generateSobjectSpec({
-    baseUrl,
-    apiVersion,
-    cwd,
-    resourcePaths,
-    injectQueryEndpoints,
-}: GenerateSobjectSpecInput): Promise<string> {
-    const org = await getSfdxOrgInfo({ baseUrl, cwd })
+export async function generateSobjectSpec(
+    { baseUrl, apiVersion, cwd, resourcePaths, injectQueryEndpoints }: GenerateSobjectSpecInput,
+    { _getSfdxOrgInfo } = { _getSfdxOrgInfo: getSfdxOrgInfo },
+): Promise<string> {
+    const org = await _getSfdxOrgInfo({ baseUrl, cwd })
 
     const client = got.extend({
         prefixUrl: `${baseUrl}`,
@@ -52,9 +50,10 @@ export async function generateSobjectSpec({
         console.info(
             `${chalk.red(
                 '❌',
-            )} Failed to generate, the token may be expired. To sign in, install sfdx and execute:\n\tsfdx org login web -r ${baseUrl}`,
+            )} Failed to generate, the token may be expired. To sign in, install sfdx and execute:\n\tsfdx org login web -r ${baseUrl}\n`,
         )
-        throw task
+        console.info(`${chalk.yellow('⚠')} Response:`, formatError(task))
+        throw new Error('Failed to generate, Salesforce did not return a valid response')
     }
 
     for (let i = 0; i < 20 && !isFailure(task) && task.apiTaskStatus !== 'COMPLETED'; ++i) {
@@ -74,11 +73,26 @@ export async function generateSobjectSpec({
         return client.get(t.resultsHref.replace(/^\/*(.*)$/g, '$1')).json<Partial<OpenapiV3>>()
     })
 
+    if (isFailure(result) && result instanceof HTTPError && result.response.statusCode === 400) {
+        const { expected, actual } =
+            /ApiTask with id: (?<refId>.*) version: (?<expected>[0-9\.]+) must match ApiVersion for result retrieval: (?<actual>[0-9\.]+)/.exec(
+                JSON.stringify(result.response.body),
+            )?.groups ?? {}
+
+        if (expected !== undefined && actual !== undefined) {
+            console.info(`${chalk.yellow('⚠')} Retrieved result is not the expected version, retrying...`)
+            result = await mapTry(task, (t) =>
+                client.get(t.resultsHref.replace(/^\/*(.*)$/g, '$1').replace(actual, expected)).json<Partial<OpenapiV3>>(),
+            )
+        }
+    }
+
     if (isFailure(result) || result?.info?.version === undefined) {
         const err = new Error('Failed to generate an expected output')
         err.cause = { result }
-        console.info(`${chalk.red('❌')} ${err.message}.`, { result })
-        throw err
+        console.info(`${chalk.red('❌')} ${err.message}.`)
+        console.info(`${chalk.yellow('⚠')} Response:`, formatError(result))
+        throw new Error('Failed to generate an expected output')
     }
 
     console.log(

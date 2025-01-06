@@ -1,11 +1,11 @@
-import { injectQueryPaths } from './responses.js'
-
 import { asTry, isFailure, mapTry, sleep } from '@skyleague/axioms'
 import type { OpenapiV3 } from '@skyleague/therefore'
 import chalk from 'chalk'
 import got, { HTTPError } from 'got'
 import { formatError } from '../../lib/error.js'
 import { getSfdxOrgInfo } from '../../lib/sfdx/index.js'
+import { injectQueryPaths } from './responses.js'
+
 interface GenerateSobjectSpecInput {
     baseUrl: string
     apiVersion: string

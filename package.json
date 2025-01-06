@@ -21,34 +21,34 @@
   "files": ["bin", ".dist", "package.json"],
   "scripts": {
     "build": "tsc -p tsconfig.dist.json",
-    "build:docs": "npm run --workspace=docs build",
+    "build:docs": "npm run --prefix=docs build",
     "check:coverage": "vitest run --coverage=true",
     "check:project": "node-standards lint",
     "check:types": "tsc -p tsconfig.json",
     "lint": "biome check",
-    "lint:fix": "npm run lint -- --write --unsafe",
-    "package": "rm -rf .dist && npm run build",
+    "lint:fix": "node --run lint -- --write --unsafe",
+    "package": "rm -rf .dist && node --run build",
     "prepare": "husky || true",
     "test": "vitest run"
   },
   "dependencies": {
-    "@skyleague/axioms": "^4.5.2",
+    "@skyleague/axioms": "^6.5.1",
     "chalk": "^5.3.0",
     "date-fns": "^4.1.0",
-    "inquirer": "^12.0.1",
+    "inquirer": "^12.3.0",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
-    "@skyleague/node-standards": "^8.1.2",
-    "@skyleague/therefore": "^5.17.0",
+    "@skyleague/node-standards": "^9.5.1",
+    "@skyleague/therefore": "^7.9.0",
     "@types/inquirer": "^9.0.7",
     "@types/yargs": "^17.0.33",
-    "got": "^14.4.4",
+    "got": "^14.4.5",
     "nock": "^13.5.6",
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.2"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "publishConfig": {
     "access": "public",
@@ -57,6 +57,5 @@
   },
   "node-standards": {
     "extends": ["yargs-cli", "docusaurus"]
-  },
-  "workspaces": ["docs"]
+  }
 }
